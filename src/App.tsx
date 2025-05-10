@@ -1,11 +1,19 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useRoutes,
+} from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
+
+// Import Tempo routes
+import routes from "tempo-routes";
 
 // Pages
 import LoginPage from "./pages/LoginPage";
@@ -26,6 +34,12 @@ import Shifts from "./pages/Shifts";
 
 const queryClient = new QueryClient();
 
+// Custom component to handle Tempo routes
+const TempoRoutes = () => {
+  const tempoRoutes = useRoutes(routes);
+  return tempoRoutes;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -33,30 +47,33 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          {/* Tempo routes - only included in development */}
+          {import.meta.env.VITE_TEMPO && <TempoRoutes />}
+
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
-            
+
             {/* Protected Routes (accessible to all authenticated users) */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/returns" element={<Returns />} />
             </Route>
-            
+
             {/* Routes requiring Admin or Cashier role */}
             <Route element={<ProtectedRoute requiredRole="cashier" />}>
               <Route path="/sales" element={<Sales />} />
               <Route path="/customers" element={<Customers />} />
             </Route>
-            
+
             {/* Routes requiring Admin or Pharmacist role */}
             <Route element={<ProtectedRoute requiredRole="pharmacist" />}>
               <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/purchases" element={<Purchases />} />
             </Route>
-            
+
             {/* Routes requiring Admin role */}
             <Route element={<ProtectedRoute requiredRole="admin" />}>
               <Route path="/reports" element={<Reports />} />
@@ -65,10 +82,13 @@ const App = () => (
               <Route path="/users" element={<Users />} />
               <Route path="/shifts" element={<Shifts />} />
             </Route>
-            
+
+            {/* Allow Tempo routes before catch-all */}
+            {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
+
             {/* Redirect root to dashboard */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
+
             {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>

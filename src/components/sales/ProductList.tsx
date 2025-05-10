@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,21 +9,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Plus } from 'lucide-react';
-import { medicines } from '@/data/mockData';
+import { Search, Plus } from "lucide-react";
+import { medicines as initialMedicines } from "@/data/mockData";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ProductListProps {
-  onAddToCart: (medicine: typeof medicines[0]) => void;
+  onAddToCart: (medicine: (typeof initialMedicines)[0]) => void;
 }
 
 const ProductList = ({ onAddToCart }: ProductListProps) => {
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<typeof medicines>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof initialMedicines>(
+    [],
+  );
+  const [medicines, setMedicines] = useState<typeof initialMedicines>([]);
 
   useEffect(() => {
-    setSearchResults(medicines);
+    // Load medicines from localStorage or use initial data
+    const storedMedicines = localStorage.getItem("medicines");
+    if (storedMedicines) {
+      const parsedMedicines = JSON.parse(storedMedicines);
+      setMedicines(parsedMedicines);
+      setSearchResults(parsedMedicines);
+    } else {
+      setMedicines(initialMedicines);
+      setSearchResults(initialMedicines);
+    }
   }, []);
 
   const handleSearch = () => {
@@ -32,17 +43,18 @@ const ProductList = ({ onAddToCart }: ProductListProps) => {
       setSearchResults(medicines);
       return;
     }
-    
+
     const results = medicines.filter(
-      medicine => medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                 medicine.id.toLowerCase().includes(searchTerm.toLowerCase())
+      (medicine) =>
+        medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        medicine.id.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-    
+
     setSearchResults(results);
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch();
     }
   };
@@ -51,8 +63,8 @@ const ProductList = ({ onAddToCart }: ProductListProps) => {
     <div className="space-y-4">
       <div className="flex gap-2">
         <div className="flex-1">
-          <Input 
-            placeholder="Search by name or code..." 
+          <Input
+            placeholder="Search by name or code..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -63,7 +75,7 @@ const ProductList = ({ onAddToCart }: ProductListProps) => {
           Search
         </Button>
       </div>
-      
+
       {searchResults.length > 0 && (
         <div className="border rounded-md overflow-hidden max-h-64 overflow-y-auto">
           <Table>
@@ -80,12 +92,16 @@ const ProductList = ({ onAddToCart }: ProductListProps) => {
                 <TableRow key={medicine.id}>
                   <TableCell>{medicine.name}</TableCell>
                   <TableCell>${medicine.price.toFixed(2)}</TableCell>
-                  <TableCell className={medicine.stock <= 10 ? "text-red-500 font-medium" : ""}>
+                  <TableCell
+                    className={
+                      medicine.stock <= 10 ? "text-red-500 font-medium" : ""
+                    }
+                  >
                     {medicine.stock}
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant={medicine.stock <= 0 ? "ghost" : "ghost"}
                       onClick={() => onAddToCart(medicine)}
                       disabled={medicine.stock <= 0}
@@ -99,12 +115,14 @@ const ProductList = ({ onAddToCart }: ProductListProps) => {
           </Table>
         </div>
       )}
-      
+
       {searchResults.length === 0 && (
         <div className="text-center py-8 border rounded-md">
           <Search className="mx-auto h-12 w-12 text-gray-300" />
           <h3 className="mt-2 text-lg font-medium">No products found</h3>
-          <p className="text-sm text-gray-500">Try searching for another product</p>
+          <p className="text-sm text-gray-500">
+            Try searching for another product
+          </p>
         </div>
       )}
     </div>

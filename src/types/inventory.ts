@@ -1,4 +1,3 @@
-
 export interface Medicine {
   id: string;
   name: string;
@@ -6,4 +5,8 @@ export interface Medicine {
   stock: number;
   price: number;
   expiryDate: string;
+  manufacturer?: string;
+  description?: string;
+  dosage?: string;
+  image?: string;
 }

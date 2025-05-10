@@ -1,21 +1,39 @@
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
 interface ImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onImport: () => void;
+  onImport: (file: File | null) => void;
 }
 
 export const ImportDialog = ({
   open,
   onOpenChange,
   onFileSelect,
-  onImport
+  onImport,
 }: ImportDialogProps) => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+    onFileSelect(e);
+  };
+
+  const handleImport = () => {
+    onImport(selectedFile);
+    setSelectedFile(null);
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -25,26 +43,29 @@ export const ImportDialog = ({
             Import inventory data from a CSV or Excel file
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Upload File</label>
-            <Input 
-              type="file" 
-              accept=".csv,.xlsx,.xls" 
-              onChange={onFileSelect}
+            <Input
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleFileChange}
             />
             <p className="text-sm text-muted-foreground mt-2">
               Supported formats: CSV, XLSX, XLS
             </p>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex items-center p-3 bg-amber-50 border border-amber-200 rounded-md">
               <div className="text-sm text-amber-800">
                 <p className="font-medium">Import Guidelines:</p>
                 <ul className="list-disc pl-5 mt-1">
-                  <li>File must contain columns: Name, Category, Stock, Price, Expiry Date</li>
+                  <li>
+                    File must contain columns: Name, Category, Stock, Price,
+                    Expiry Date
+                  </li>
                   <li>First row should be column headers</li>
                   <li>Dates should be in YYYY-MM-DD format</li>
                 </ul>
@@ -52,10 +73,14 @@ export const ImportDialog = ({
             </div>
           </div>
         </div>
-        
+
         <div className="flex justify-end space-x-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={onImport}>Import Data</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleImport} disabled={!selectedFile}>
+            Import Data
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
