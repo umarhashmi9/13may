@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,7 +54,7 @@ const SalesHistory = ({ salesHistory, onPrintReceipt }: SalesHistoryProps) => {
                       <TableCell>{sale.id.slice(-6)}</TableCell>
                       <TableCell>{new Date(sale.timestamp).toLocaleString()}</TableCell>
                       <TableCell>{sale.customer || 'Walk-in'}</TableCell>
-                      <TableCell>PKR {sale.total.toFixed(2)}</TableCell>
+                      <TableCell>Rs. {sale.total.toFixed(2)}</TableCell>
                       <TableCell>{sale.paymentMethod}</TableCell>
                       <TableCell>
                         <Button 

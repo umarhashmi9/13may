@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -46,7 +45,7 @@ const CartDisplay = ({ cart, onUpdateQuantity, onRemoveItem }: CartDisplayProps)
               {cart.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell>${item.price.toFixed(2)}</TableCell>
+                  <TableCell>Rs. {item.price.toFixed(2)}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <Button 
@@ -68,7 +67,7 @@ const CartDisplay = ({ cart, onUpdateQuantity, onRemoveItem }: CartDisplayProps)
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell>${item.total.toFixed(2)}</TableCell>
+                  <TableCell>Rs. {item.total.toFixed(2)}</TableCell>
                   <TableCell>
                     <Button 
                       size="sm" 

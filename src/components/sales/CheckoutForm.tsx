@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -25,10 +24,8 @@ const CheckoutForm = ({
   onCustomerChange,
   onCheckout
 }: CheckoutFormProps) => {
-  const {
-    toast
-  } = useToast();
-  const [taxRate, setTaxRate] = useState(5);
+  const { toast } = useToast();
+  const [taxRate, setTaxRate] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('cash');
 
@@ -38,7 +35,6 @@ const CheckoutForm = ({
   const calculatedTotal = subtotal + calculatedTax - calculatedDiscount;
 
   const handlePrint = () => {
-    // Create a printable version of the receipt
     const printContent = `
       <html>
         <head>
@@ -64,20 +60,21 @@ const CheckoutForm = ({
           </div>
           <div class="item">
             <span>Subtotal:</span>
-            <span>PKR ${subtotal.toFixed(2)}</span>
+            <span>Rs. ${subtotal.toFixed(2)}</span>
           </div>
+          ${taxRate > 0 ? `
           <div class="item">
             <span>Tax (${taxRate}%):</span>
-            <span>PKR ${calculatedTax.toFixed(2)}</span>
-          </div>
+            <span>Rs. ${calculatedTax.toFixed(2)}</span>
+          </div>` : ''}
           ${discount > 0 ? `
           <div class="item">
             <span>Discount (${discount}%):</span>
-            <span>PKR ${calculatedDiscount.toFixed(2)}</span>
+            <span>Rs. ${calculatedDiscount.toFixed(2)}</span>
           </div>` : ''}
           <div class="total">
             <span>Total:</span>
-            <span>PKR ${calculatedTotal.toFixed(2)}</span>
+            <span>Rs. ${calculatedTotal.toFixed(2)}</span>
           </div>
           <div class="footer">
             <p>Thank you for choosing MedPulse Pharmacy!</p>
@@ -92,8 +89,6 @@ const CheckoutForm = ({
       printWindow.focus();
       setTimeout(() => {
         printWindow.print();
-        // Closing is optional and browser-dependent
-        // printWindow.close();
       }, 500);
       toast({
         title: "Printing receipt",
@@ -106,13 +101,6 @@ const CheckoutForm = ({
         variant: "destructive"
       });
     }
-  };
-
-  // Update checkout handler to pass payment method data to parent
-  const handleCheckout = () => {
-    // We need to access the payment method in the parent component
-    // so we'll use the parent's onCheckout function
-    onCheckout();
   };
 
   return <div className="space-y-4">
@@ -148,7 +136,7 @@ const CheckoutForm = ({
       <div className="pt-4 border-t space-y-2">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>PKR {subtotal.toFixed(2)}</span>
+          <span>Rs. {subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -156,7 +144,7 @@ const CheckoutForm = ({
             <Input type="number" className="w-16 h-8 p-1 text-center" value={taxRate} onChange={e => setTaxRate(parseFloat(e.target.value) || 0)} />
             <span>%</span>
           </div>
-          <span>PKR {calculatedTax.toFixed(2)}</span>
+          <span>Rs. {calculatedTax.toFixed(2)}</span>
         </div>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -164,19 +152,18 @@ const CheckoutForm = ({
             <Input type="number" className="w-16 h-8 p-1 text-center" value={discount} onChange={e => setDiscount(parseFloat(e.target.value) || 0)} />
             <span>%</span>
           </div>
-          <span>PKR {calculatedDiscount.toFixed(2)}</span>
+          <span>Rs. {calculatedDiscount.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-lg font-bold pt-2 border-t">
           <span>Total</span>
-          <span>PKR {calculatedTotal.toFixed(2)}</span>
+          <span>Rs. {calculatedTotal.toFixed(2)}</span>
         </div>
       </div>
       
       <div className="pt-4 space-y-2">
-        <Button className="w-full" onClick={handleCheckout}>
+        <Button className="w-full" onClick={onCheckout}>
           Checkout
         </Button>
-        
       </div>
     </div>;
 };
